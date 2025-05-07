@@ -35,9 +35,24 @@
         .button:hover {
             background-color: #0056b3;
         }
+        .meme-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .meme-subtext {
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
+    <p class="meme-text">$mind</p>
+    <p class="meme-subtext">CA: testtestesttestpump</p>
     <h1>Meme Generator</h1>
     <input type="file" id="imageInput" accept="image/*">
     <canvas id="canvas" width="600" height="600"></canvas>
@@ -95,11 +110,11 @@
 
             // If the user has uploaded an image, draw it in the "head" area
             if (userImage) {
-                // Define the head area as a circle, adjusted for the 600x600 template
-                const headX = 300; // Center X of the head (canvas width / 2)
-                const headY = 200; // Center Y of the head, 1/3 from the top of the canvas
-                const headRadius = 100; // Radius of the head area
-                const headDiameter = headRadius * 2; // 200px
+                // Define the head area as a circle
+                const headX = 330;
+                const headY = 280;
+                const headRadius = 120; // Larger radius as previously adjusted
+                const headDiameter = headRadius * 2; // 240px
 
                 // Create a circular clipping path
                 ctx.save();
@@ -127,7 +142,7 @@
                 ctx.drawImage(
                     userImage,
                     srcX, srcY, srcSize, srcSize, // Source: crop to square
-                    headX - headRadius, headY - headRadius, headDiameter, headDiameter // Destination: fit in circle
+                    headX - headRadius, headY - headRadius, headDiameter, headDiameter // Destination: fit in the larger circle
                 );
 
                 ctx.restore();
