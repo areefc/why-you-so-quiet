@@ -20,6 +20,8 @@
         #canvas {
             border: 2px solid #333;
             margin: 20px 0;
+            width: 600px; /* Match the canvas pixel width */
+            height: 600px; /* Match the canvas pixel height */
         }
         .button {
             padding: 10px 20px;
@@ -38,7 +40,7 @@
 <body>
     <h1>Meme Generator</h1>
     <input type="file" id="imageInput" accept="image/*">
-    <canvas id="canvas" width="600" height="400"></canvas>
+    <canvas id="canvas" width="600" height="600"></canvas>
     <button class="button" onclick="downloadMeme()">Download Meme</button>
 
     <script>
@@ -46,7 +48,7 @@
         const ctx = canvas.getContext('2d');
         const imageInput = document.getElementById('imageInput');
 
-        // Use the confirmed Imgur direct URL for the template image
+        // Use the provided Imgur direct URL for the template image
         const templateImageSrc = 'https://i.imgur.com/KebqnXk.png';
 
         const templateImage = new Image();
@@ -88,16 +90,16 @@
             // Clear the canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw the template image
+            // Draw the template image at its original dimensions (600x600)
             ctx.drawImage(templateImage, 0, 0, canvas.width, canvas.height);
 
             // If the user has uploaded an image, draw it in the "head" area
             if (userImage) {
-                // Approximate the head area as a circle
-                // Based on the template, the head is roughly centered at (300, 150) with a radius of 100px
-                const headX = 300; // Center X of the head
-                const headY = 150; // Center Y of the head
+                // Define the head area as a circle, adjusted for the 600x600 template
+                const headX = 300; // Center X of the head (canvas width / 2)
+                const headY = 200; // Center Y of the head, 1/3 from the top of the canvas
                 const headRadius = 100; // Radius of the head area
+                const headDiameter = headRadius * 2; // 200px
 
                 // Create a circular clipping path
                 ctx.save();
@@ -105,18 +107,28 @@
                 ctx.arc(headX, headY, headRadius, 0, Math.PI * 2);
                 ctx.clip();
 
-                // Draw the user image inside the circular area
-                // Scale the image to fit within the circle
-                const imgAspect = userImage.width / userImage.height;
-                let drawWidth, drawHeight;
-                if (imgAspect > 1) {
-                    drawWidth = headRadius * 2 * imgAspect;
-                    drawHeight = headRadius * 2;
+                // Crop the user image to a square
+                const imgWidth = userImage.width;
+                const imgHeight = userImage.height;
+                let srcX, srcY, srcSize;
+
+                // Use the smaller dimension to make the image square
+                if (imgWidth > imgHeight) {
+                    srcSize = imgHeight; // Use height as the square size
+                    srcX = (imgWidth - imgHeight) / 2; // Center the crop horizontally
+                    srcY = 0;
                 } else {
-                    drawWidth = headRadius * 2;
-                    drawHeight = headRadius * 2 / imgAspect;
+                    srcSize = imgWidth; // Use width as the square size
+                    srcX = 0;
+                    srcY = (imgHeight - imgWidth) / 2; // Center the crop vertically
                 }
-                ctx.drawImage(userImage, headX - headRadius, headY - headRadius, drawWidth, drawHeight);
+
+                // Draw the square-cropped image into the circular area
+                ctx.drawImage(
+                    userImage,
+                    srcX, srcY, srcSize, srcSize, // Source: crop to square
+                    headX - headRadius, headY - headRadius, headDiameter, headDiameter // Destination: fit in circle
+                );
 
                 ctx.restore();
             }
